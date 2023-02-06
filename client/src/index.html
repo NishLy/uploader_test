@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- <link rel="stylesheet" href="css/output.css" /> -->
+  <title>Document</title>
+</head>
+
+<body class="flex justify-center items-center p-5 h-screen">
+  <div class="container-primary bg-slate-700 max-h-[80vh] flex-col relative justify-start">
+
+    <div id="timer-wrapper"
+      class="p-2 text-white absolute right-4 top-[-2rem] w-52 h-16 bg-black rounded-md flex justify-center items-center box-border">
+      <table class="w-full text-center">
+        <tr id="timer" class="text-2xl font-bold"></tr>
+        <tr class="text-[.6em] font-light uppercase">
+          <td>Jam</td>
+          <td></td>
+          <td>Menit</td>
+          <td></td>
+          <td>Detik</td>
+        </tr>
+      </table>
+    </div>
+
+
+    <div class="flex mb-2 text-white h-14 flex-shrink-0">
+      <h1 id="matkul-title" class="text-xl"></h1>
+    </div>
+
+    <!-- main container  -->
+    <div class="flex justify-between items-start w-full ">
+
+      <!-- data segment  -->
+      <div class="basis-10/12 min-h-[50vh] max-h-[75vh] h-full w-full overflow-hidden overflow-y-auto mr-6">
+        <table id="main-data-table" border="1" class="w-full max-h-full text-white text-left">
+          <th>
+          <th>No</th>
+          <th>NIM</th>
+          <th>Nama</th>
+          <th>Nama File</th>
+          <th>Tanggal</th>
+          <th>Aksi</th>
+          </th>
+        </table>
+      </div>
+
+      <!-- submit panel -->
+      <div class="flex flex-col w-52 flex-shrink-0" id="component-wrapper">
+        <form id="form-main" action="/upload" method="post" enctype="multipart/form-data" class="flex flex-col">
+          <label for="nim">NIM</label>
+          <input type="text" required name="nim" pattern="[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9][0-9]"
+            title="Masukan NIM" placeholder="contoh : 20.240.0001" />
+          <label for="nama">Nama</label>
+          <input type="text" required name="nama" title="Masukan Nama" />
+          <label for="file">File</label>
+          <input id="fileInput" type="file" name="file-data" class="hidden" />
+          <button 2 id="invoke-modal" type="button" title="Klik untuk menambahkan file"
+            class="btn-plus w-full flex items-center justify-center text-white">
+            Pilih File
+          </button>
+          <button id="submit-btn" type="submit" class="btn-primary mt-4">SUBMIT</button>
+        </form>
+      </div>
+
+      <!-- error handler  -->
+      <div id="modal-area"
+        class="flex justify-center items-center w-full h-screen fixed top-0 left-0 bg-transparent hidden">
+        <div id="drop-zone"
+          class="relative rounded-sm p-5 flex flex-col items-center justify-center w-[90%] h-[80%] bg-slate-100">
+          <button class="btn-primary" id="chose-file-btn">Broswe</button>
+          <h1 class="mb-2">Atau Drop File kesini</h1>
+          <svg class="absolute top-5 right-5 w-3 h-3" viewPort="0 0 12 12" version="1.1"
+            xmlns="http://www.w3.org/2000/svg">
+            <line x1="1" y1="11" x2="11" y2="1" stroke="black" stroke-width="2" />
+            <line x1="1" y1="1" x2="11" y2="11" stroke="black" stroke-width="2" />
+          </svg>
+        </div>
+      </div>
+      <div id="error-modal" class="fixed bottom-5 left-0 w-full grid-cols-1 grid-flow-row gap-y-3"></div>
+</body>
+
+</html>

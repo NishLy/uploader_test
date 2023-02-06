@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@700;800&display=swap");
+
+/* #525461 */
+@layer components {
+  *:root {
+    font-size: 20px;
+    font-family: "Open Sans", sans-serif;
+  }
+
+  body {
+    background-color: #525461;
+    overflow: hidden;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 2px #525461;
+    border-radius: 5px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: white;
+    border-radius: 5px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.808);
+  }
+
+  .drag {
+    @apply outline outline-4 outline-blue-400;
+  }
+
+  .container-primary {
+    @apply flex justify-between rounded-md min-h-[85vh] min-w-[90vw] p-5 bg-center  bg-no-repeat bg-cover;
+    background-image: linear-gradient(
+      to right,
+      #282a371e,
+      #282a37c7,
+      #282a37,
+      #282a37
+    );
+    /* url("../img/bg-main.jpg"); */
+  }
+
+  input,
+  .input-form {
+    @apply text-sm p-2 w-full border-gray-900/50 border-2 rounded-md bg-transparent outline-none text-white;
+  }
+
+  
+  #main-data-table td,th {
+    @apply max-w-[14rem]  px-2 h-5;
+  }
+
+  #main-data-table td {
+    @apply break-words;
+  }
+
+  #main-data-table tr:first-child {
+    @apply bg-white text-[#282a37];
+  }
+
+  #main-data-table tr:last-child {
+    @apply rounded-b-md;
+  }
+
+  #main-data-table td {
+    @apply text-sm p-2;
+  }
+
+  input:autofill {
+    @apply border-blue-500 text-white bg-transparent;
+  }
+  input:-webkit-autofill {
+    @apply border-blue-500 text-white bg-transparent;
+  }
+
+  input:focus {
+    @apply border-blue-500;
+  }
+
+  label {
+    @apply text-white my-1 text-xs;
+  }
+
+  .btn-plus {
+    @apply rounded-md p-2 bg-transparent  border-gray-900/50 border-2 max-w-sm;
+  }
+
+  .btn-primary {
+    @apply rounded-md px-2 py-1 bg-blue-500 font-bold uppercase;
+  }
+  .btn-danger {
+    @apply rounded-md px-2 py-1 bg-red-500 font-bold uppercase;
+  }
+
+  #timer-wrapper {
+    background: rgb(87, 132, 182);
+    background: linear-gradient(
+      146deg,
+      rgba(87, 132, 182, 1) 0%,
+      rgba(110, 171, 191, 1) 25%,
+      rgba(39, 184, 179, 1) 50%,
+      rgba(53, 170, 177, 1) 75%,
+      rgba(0, 185, 193, 1) 100%
+    );
+  }
+}
