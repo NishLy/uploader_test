@@ -101,7 +101,7 @@ function TemplateConfig(): string {
     const minutes = isConfig && new Date(config.end).getMinutes()
 
     return `
-    <form id="form-main" class="grid gap-y-1 grid-flow-row">
+    <form id="form-main" class="grid grid-flow-row">
     <label for="config_name">Uploader Name</label>
     <input required type="text" name="name" value="${isConfig ? config.uploader_name : ""}">
     <label for="path">Path</label>

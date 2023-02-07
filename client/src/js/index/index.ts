@@ -87,6 +87,7 @@ function mountEventListener() {
     document.querySelector('#form-main')?.addEventListener("submit", (event: Event) => {
         event.preventDefault();
         if (!config) return drawAlert("Konfigurasi Belum valid!")
+        if (new Date(config.end).getTime() - new Date().getTime() <= 0) return drawAlert("Waktu Telah Habis!. Upload Gagal")
         const formData = new FormData(event.target as HTMLFormElement)
         useFetch({ url: "/upload", body: formData, method: HTTPMethod.post, type: "multipart/form-data" }, {
             oncomplete: () => {
@@ -107,9 +108,6 @@ function mountEventListener() {
         fileInputObject.resetInput()
     })
     document.querySelector('#fileInput')?.addEventListener('change', () => fileInputObject.fileValidition())
-    document.querySelector('#form-main')?.addEventListener('submit', () => {
-        if (new Date(config.end).getTime() - new Date().getTime() <= 0) return drawAlert("Waktu Telah Habis!. Upload Gagal")
-    })
 }
 
 

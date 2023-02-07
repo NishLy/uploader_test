@@ -9,10 +9,12 @@ import writeLogs, { readLogs } from "../utils/logHandler";
 dotenv.config()
 const routes = Router()
 
+/* A route that is used to serve the admin page. */
 routes.get('/', (_req, res) => {
     res.sendFile('admin.html', { root: '../client/dist' })
 })
 
+/* A route that is used to login to the application. */
 routes.post('/login', async (req, res) => {
     if (req.body.password !== "1") return res.status(401).json({ 'message': 'gagal login' })
     const token = jwt.sign({ username: req.body.username, password: req.body.password }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: 60 * 5 })
@@ -20,6 +22,7 @@ routes.post('/login', async (req, res) => {
     return res.status(200).json({ 'message': 'logged successfuly', token, expires: Date.now() + (1000 * 60 * 5) })
 })
 
+/* A route that is used to update the configuration of the application. */
 routes.post('/config', authenticateToken, async (req, res) => {
     useConfig(req.body as UPLOADER_CONFIGURATION)
     if (!fs.existsSync(useConfig()!.dir + "\\log.json")) await writeLogs(useConfig()!)
@@ -35,6 +38,16 @@ routes.post('/config', authenticateToken, async (req, res) => {
 })
 
 export default routes
+
+/**
+ * If the token is not present or is undefined, return a 401 status code. If the token is present,
+ * verify it and if it is valid, add the user object to the request body and call the next function.
+ * @param {Request} req - Request - The request object
+ * @param {Response} res - Response - the response object
+ * @param {NextFunction} next - NextFunction - This is a function that will be called when the
+ * middleware is done.
+ * @returns The user object is being returned.
+ */
 function authenticateToken(req: Request, res: Response, next: NextFunction) {
     const authHader = req.headers['authorization']
     const token = authHader?.split(' ')[1]
@@ -48,15 +61,20 @@ function authenticateToken(req: Request, res: Response, next: NextFunction) {
     })
 }
 
-function parseConfigLogs(json: any) {
-    if (!json) return null
-    const data = JSON.parse(json)
-    delete data.last_modified
-    delete data.data
-    return data
-}
+// function parseConfigLogs(json: any) {
+//     if (!json) return null
+//     const data = JSON.parse(json)
+//     delete data.last_modified
+//     delete data.data
+//     return data
+// }
 
 
+/**
+ * It takes a JSON string and returns the data property of the parsed JSON object
+ * @param {any} json - any - the JSON string to parse
+ * @returns The data.data property of the parsed JSON.
+ */
 function parseDataLogs(json: any) {
     if (!json) return null
     const data = JSON.parse(json) ?? null

@@ -1,5 +1,6 @@
 import { DATA_INTERFACE } from "..";
 
+/* It's a class that manages an array of objects that have a property called nim. */
 class ListData {
     private data: DATA_INTERFACE[];
     constructor(data: DATA_INTERFACE[]) {
@@ -20,7 +21,7 @@ class ListData {
         if (index !== -1) this.data[index] = data
     }
     get(nim: string) {
-        return this.data.find((data) => data.nim === nim) 
+        return this.data.find((data) => data.nim === nim)
     }
     getAll() {
         return this.data
