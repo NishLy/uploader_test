@@ -39,16 +39,10 @@ App.get('/config', (_, res) => {
 })
 
 io.on('connection', (socket) => {
-  console.log('user connected sending updated upload data');
-  emitUpload(socket)
+  socket.emit('data-upload', JSON.stringify(getData() ?? {}))
   socket.emit('config', JSON.stringify(useConfig()))
 });
 
-export const emitUpload = (socket: Socket) => {
-  socket.emit('data-upload', JSON.stringify(getData() ?? {}), (response: Response) => {
-    console.log(response)
-  })
-}
 
 export const getData = (): DATA_JSON | null => {
   if (!useConfig()) return null

@@ -15,22 +15,22 @@ routes.get('/', (_req, res) => {
 
 routes.post('/login', async (req, res) => {
     if (req.body.password !== "1") return res.status(401).json({ 'message': 'gagal login' })
-    const token = jwt.sign({ user: req.body.username }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: 60 * 5 })
+    const token = jwt.sign({ username: req.body.username, password: req.body.password }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: 60 * 5 })
     // if(!useConfig()) readLogs
     return res.status(200).json({ 'message': 'logged successfuly', token, expires: Date.now() + (1000 * 60 * 5) })
 })
 
-routes.post('/config', authenticateToken, (req, res) => {
+routes.post('/config', authenticateToken, async (req, res) => {
     useConfig(req.body as UPLOADER_CONFIGURATION)
-    if (!fs.existsSync(useConfig()!.dir)) return res.status(404).json({ message: "Directory not found" })
-    if (!fs.existsSync(useConfig()!.dir + "\\log.json")) writeLogs(useConfig()!)
-    else readLogs(useConfig()!.dir + "\\log.json").then((json) => {
+    if (!fs.existsSync(useConfig()!.dir + "\\log.json")) await writeLogs(useConfig()!)
+    readLogs(useConfig()!.dir + "\\log.json").then((json) => {
         listData.setAll(parseDataLogs(json))
-        writeLogs(useConfig()!,listData.getAll())
+        writeLogs(useConfig()!, listData.getAll())
         io.emit('config', JSON.stringify(useConfig()))
-        // useConfig(parseConfigLogs(json) ?? useConfig());
+        io.emit('data-upload', JSON.stringify(getData() ?? {}), (response: Response) => {
+            console.log(response)
+        })
     })
- 
     res.status(200).json({ message: "updated" }).end()
 })
 
@@ -41,13 +41,16 @@ function authenticateToken(req: Request, res: Response, next: NextFunction) {
     if (!token || token === "undefined") return res.sendStatus(401)
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, (err, user) => {
         if (err) return res.sendStatus(403)
-        req.body.username = user
+        if (user) {
+            req.body = { ...req.body, ...user as object }
+        }
         next()
     })
 }
 
 function parseConfigLogs(json: any) {
-    const data = JSON.parse(json) ?? null
+    if (!json) return null
+    const data = JSON.parse(json)
     delete data.last_modified
     delete data.data
     return data
@@ -55,6 +58,7 @@ function parseConfigLogs(json: any) {
 
 
 function parseDataLogs(json: any) {
-    const data = JSON.parse(json)
-    return data.data
+    if (!json) return null
+    const data = JSON.parse(json) ?? null
+    return data?.data
 }

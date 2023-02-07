@@ -14,7 +14,7 @@
 
   body {
     background-color: #525461;
-    overflow: hidden;
+    @apply overflow-y-auto lg:overflow-hidden lg:py-5 justify-center p-5  py-10 flex items-center h-screen 
   }
 
   ::-webkit-scrollbar {
@@ -43,7 +43,7 @@
   }
 
   .container-primary {
-    @apply flex justify-between rounded-md min-h-[85vh] min-w-[90vw] p-5 bg-center  bg-no-repeat bg-cover;
+    @apply  flex flex-col justify-start items-start relative rounded-md w-[90vw] lg:h-[80vh] p-5 bg-center bg-no-repeat bg-cover;
     background-image: linear-gradient(
       to right,
       #282a371e,
@@ -56,12 +56,16 @@
 
   input,
   .input-form {
-    @apply text-sm p-2 w-full border-gray-900/50 border-2 rounded-md bg-transparent outline-none text-white;
+    @apply  text-sm p-2 w-full border-gray-900/50 border-2 rounded-md bg-transparent outline-none text-white;
   }
 
-  
-  #main-data-table td,th {
-    @apply max-w-[14rem]  px-2 h-5;
+  input,select,.btn-primary{
+    @apply lg:box-border lg:w-52
+  }
+
+  #main-data-table td,
+  th {
+    @apply max-w-[14rem]  p-2 h-5;
   }
 
   #main-data-table td {
@@ -96,14 +100,14 @@
   }
 
   .btn-plus {
-    @apply rounded-md p-2 bg-transparent  border-gray-900/50 border-2 max-w-sm;
+    @apply rounded-md p-2 bg-transparent border-gray-900/50 border-2;
   }
 
   .btn-primary {
-    @apply rounded-md px-2 py-1 bg-blue-500 font-bold uppercase;
+    @apply rounded-md p-2 bg-blue-400 font-bold uppercase;
   }
   .btn-danger {
-    @apply rounded-md px-2 py-1 bg-red-500 font-bold uppercase;
+    @apply rounded-md p-2 bg-red-500 font-bold uppercase;
   }
 
   #timer-wrapper {

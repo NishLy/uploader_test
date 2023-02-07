@@ -1,4 +1,5 @@
 import { DATA_JSON, DATA_INTERFACE } from "../..";
+import { drawAlert } from "./drawAlert";
 import useFetch, { HTTPMethod } from "./useFetch";
 let last_draw: number;
 
@@ -7,7 +8,7 @@ export default function DrawMTableData({ last_fetched, data, isLoged = false }: 
     console.log(data)
     table.innerHTML = ""
     table.innerHTML = `<tr><th>No</th><th>NIM</th><th>Nama</th><th>Nama File</th><th>Tanggal</th><th>Aksi</th></tr>`
-    
+
     if (!last_fetched) return
     if (data.length === 0) return
     if (last_fetched === last_draw) return
@@ -46,10 +47,10 @@ const drawTr = (tr: HTMLTableRowElement, index: number, element: DATA_INTERFACE,
 
     td = document.createElement('td')
     if (isLoged) {
-        td.innerHTML = "<button>Hapus</button> "
+        td.innerHTML = "<button class='bg-red-500 px-2 py-1 rounded-md'>Hapus</button> "
         td.addEventListener('click', () => {
-            if (!confirm("Konfirmasi Penghapusan?")) return
-            useFetch({ url: '/uploads/${element.nim}', method: HTTPMethod.delete })
+            if (!confirm("Hapus data milik " + element.nim + " ?")) return
+            useFetch({ url: '/upload/', method: HTTPMethod.delete, body: JSON.stringify({ nim: element.nim }) }, { oncomplete: () => drawAlert("Data milik " + element.nim + " terhapus") })
         })
     }
     tr.appendChild(td)

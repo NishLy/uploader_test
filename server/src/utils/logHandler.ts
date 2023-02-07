@@ -1,4 +1,3 @@
-import { json } from "body-parser"
 import fs from "fs"
 import { UPLOADER_CONFIGURATION, DATA_INTERFACE } from ".."
 import useConfig from "../server"
@@ -7,7 +6,7 @@ export const createDirectory = (path: string): Promise<boolean> => {
     return new Promise<boolean>((resolve, reject) => {
         if (!fs.existsSync(path)) {
             fs.mkdir(path, (err) => {
-                console.log(err)
+                printLog(err)
                 if (err) reject(false);
             })
         }
@@ -39,7 +38,6 @@ const writeLogs = async (config: UPLOADER_CONFIGURATION, data?: DATA_INTERFACE[]
     const logConfig = {
         uploader_name, matkul, kelas, dir, end, last_modified: new Date().getTime(), format_name, file_types, data: data ?? []
     }
-    console.log(logConfig)
     if (await !createDirectory(config.dir)) return console.log('error create logs')
     await fs.writeFile(config.dir + "\\log.json", JSON.stringify(logConfig), (err: any) => {
         return new Promise((resolve, rejects) => {
@@ -50,17 +48,18 @@ const writeLogs = async (config: UPLOADER_CONFIGURATION, data?: DATA_INTERFACE[]
 }
 
 const writeErrorLog = (path: string, error: string) => {
-    fs.existsSync(path) ? fs.writeFile(path, `${new Date().toISOString} -> ${error}`, (err) => {
-        err && console.log("Failed to write error logs!!")
+    fs.existsSync(path) ? fs.writeFile(path, `${new Date().toISOString()} -> ${error}`, (err) => {
+        err && console.log(err + " Failed to write error logs!!")
     }) :
-        fs.appendFile(path, `${new Date().toISOString} -> ${error}`, (err) => {
-            err && console.log("Failed to write error logs!!")
+        fs.appendFile(path, `${new Date().toISOString()} -> ${error}`, (err) => {
+            console.log('apendd?')
+            err && console.log(err + " Failed to write error logs!!")
         })
 }
 
 export const printLog = (data: any) => {
-    console.log(`${new Date().toISOString} -> ${data}`)
-    writeErrorLog(useConfig()?.dir ?? "\\err.txt", data.toString())
+    console.trace(`${new Date().toISOString()} -> ${data}`)
+    writeErrorLog(useConfig()?.dir + "\\err.txt", data.toString())
 }
 
 export default writeLogs

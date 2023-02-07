@@ -16,7 +16,8 @@ interface callback {
 
 export default async function useFetch({ url, body, method, token = "", type }: fetch, { oncomplete, onabbort, onfail, onfinal }: callback = { oncomplete: () => null }) {
     const controller = new AbortController();
-    const signal = controller.signal
+    const signal = controller.signal;
+    console.trace('fetch');
     try {
         const res = await fetch(url, { method: method, body, signal, headers: type ? {} : { 'Content-Type': 'application/json', 'authorization': token } })
         if (!res.ok) throw new Error("!ok")

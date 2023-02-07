@@ -12,6 +12,7 @@ class ListData {
         this.data = this.data.filter((data) => data.nim !== nim)
     }
     append(data: DATA_INTERFACE) {
+        console.log(data)
         this.data.push(data)
     }
     update(nim: string, data: DATA_INTERFACE) {
@@ -19,7 +20,7 @@ class ListData {
         if (index !== -1) this.data[index] = data
     }
     get(nim: string) {
-        return this.data.find((data) => data.nim === nim)
+        return this.data.find((data) => data.nim === nim) 
     }
     getAll() {
         return this.data

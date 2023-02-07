@@ -2,33 +2,36 @@ import "../../css/index.css"
 import "../../css/admin.css"
 import useFetch, { HTTPMethod } from "../utils/useFetch"
 import { drawAlert } from "../utils/drawAlert"
-import { DATA_JSON } from "../.."
 import { UPLOADER_CONFIGURATION } from "../.."
 import Timer from "../utils/timer"
 import drawTitle from "../utils/drawTitle"
 import initializeTimer from "../utils/drawTimer"
-import creatSocket, { onConfigRecived, onDataRecived } from "../utils/socket"
+import { onConfigRecived, onDataRecived } from "../utils/socket"
 import DrawMTableData from "../utils/drawTable"
 
 const rootElements = document.querySelector('#component-wrapper')
 let config: UPLOADER_CONFIGURATION | null = null
 let timer: Timer;
-// const Data_Snapshot: DATA_JSON | null = null
 
 window.onload = () => {
-    creatSocket()
-    onDataRecived((data) => DrawMTableData(data))
+    onDataRecived((data) => DrawMTableData({ ...data, isLoged: getAccesToken() !== "" ? true : false }))
     onConfigRecived(data => {
         config = data
+        getAccesToken() === "" ? renderLogin() : renderConfig()
         drawTitle(config?.matkul, config?.kelas);
         if (timer) timer.remove();
         timer = initializeTimer(config?.end);
         drawAlert("Konfigurasi terupdate", 1);
-        rootElements.innerHTML = TemplateConfig()
+        if (!config) rootElements.innerHTML = TemplateConfig()
     })
-    // fetchConfig(() => );
-     getAccesToken() === "" ? renderLogin() : renderConfig()
-    // drawDataTable({ last_fetched: Data_Snapshot?.last_fetched, data: Data_Snapshot?.data, isLoged: true })
+    drawTitle(config?.matkul, config?.kelas);
+    getAccesToken() === "" ? renderLogin() : renderConfig()
+    setTimeout(() => {
+        if (!config) {
+            drawAlert("Gagal Fetching data Konfigurasi, Cheking Konfigurasi diserver", 2)
+            useFetch({ url: "/config", method: HTTPMethod.get }, { oncomplete: () => window.location.reload(), onfail: () => drawAlert("Konfigurasi Belum dibuat!") })
+        }
+    }, 2000)
 }
 
 const renderLogin = (): void => {
@@ -38,21 +41,6 @@ const renderLogin = (): void => {
 const renderConfig = (): void => {
     rootElements.innerHTML = TemplateConfig()
 }
-
-// function fetchConfig(oncomplete?: () => void): void {
-//     useFetch({ url: "/config", method: HTTPMethod.get }, {
-//         oncomplete: (data) => config = data,
-//         onfinal: () => {
-//             drawTitle(config?.matkul, config?.kelas);
-//             if (timer) timer.remove();
-//             timer = initializeTimer(config?.end);
-//             drawAlert("Konfigurasi terupdate", 1);
-//             (oncomplete) && oncomplete()
-//         }
-//     })
-// }
-
-
 
 function getAccesToken(): string | undefined {
     return document.cookie.split("; ").find((row) => row.startsWith('access-token='))?.split('=')[1] ?? ""
@@ -97,8 +85,6 @@ function TemplateConfig(): string {
                 token: "Bearer " + getAccesToken()
             },
                 {
-
-                    // oncomplete: () => fetchConfig(() => rootElements.innerHTML = TemplateConfig()),
                     oncomplete: () => null,
                     onabbort: () => drawAlert("Gagal Upload Konfigurasi", 3),
                     onfail: () => {
@@ -115,7 +101,7 @@ function TemplateConfig(): string {
     const minutes = isConfig && new Date(config.end).getMinutes()
 
     return `
-    <form id="form-main" class="flex flex-col">
+    <form id="form-main" class="grid gap-y-1 grid-flow-row">
     <label for="config_name">Uploader Name</label>
     <input required type="text" name="name" value="${isConfig ? config.uploader_name : ""}">
     <label for="path">Path</label>
@@ -164,7 +150,7 @@ function TemplateLogin(isMounted = false): string {
 
 
     return `
-    <form id="form-main" class="flex flex-col">
+    <form id="form-main" class="grid gap-y-1 grid-flow-row">
         <label for="username">Username</label>
         <input type="text" name="username">
         <label for="password">Password</label>

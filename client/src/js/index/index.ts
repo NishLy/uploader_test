@@ -8,7 +8,7 @@ import { DATA_INTERFACE, UPLOADER_CONFIGURATION } from "../..";
 import useFetch, { HTTPMethod } from "../utils/useFetch";
 import drawTitle from "../utils/drawTitle";
 import initializeTimer from "../utils/drawTimer";
-import creatSocket, { onConfigRecived, onDataRecived } from "../utils/socket";
+import { onConfigRecived, onDataRecived } from "../utils/socket";
 
 ///////////////////////////////////////////////////////////////
 //  Global Variable
@@ -38,7 +38,6 @@ let timer: Timer | null = null
 
 const dropHandler = (e: DragEvent) => {
     e.preventDefault();
-    console.log(e.dataTransfer)
     if (e.dataTransfer!.files) {
         if (e.dataTransfer?.files.length !== 1) return drawAlert("Hanya bisa menerima 1 file!!")
         const inputContainer: HTMLInputElement | null = document.querySelector('#fileInput')
@@ -89,7 +88,18 @@ function mountEventListener() {
         event.preventDefault();
         if (!config) return drawAlert("Konfigurasi Belum valid!")
         const formData = new FormData(event.target as HTMLFormElement)
-        useFetch({ url: "/upload", body: formData, method: HTTPMethod.post, type: "multipart/form-data" })
+        useFetch({ url: "/upload", body: formData, method: HTTPMethod.post, type: "multipart/form-data" }, {
+            oncomplete: () => {
+                drawAlert("berhasil upload", 1);
+                (event.target as HTMLFormElement).reset();
+                document.querySelector('#invoke-modal').innerHTML = "Pilih File"
+            },
+            onfail: () => {
+                drawAlert("gagal upload");
+                (event.target as HTMLFormElement).reset();
+                document.querySelector('#invoke-modal').innerHTML = "Pilih File"
+            }
+        })
     });
     document.querySelector('#reset-btn')?.addEventListener('click', (event) => {
         event.preventDefault();
@@ -101,24 +111,6 @@ function mountEventListener() {
         if (new Date(config.end).getTime() - new Date().getTime() <= 0) return drawAlert("Waktu Telah Habis!. Upload Gagal")
     })
 }
-
-
-///////////////////////////////////////////////////////////////
-// OnInitialize
-//////////////////////////////////////////////////////////////
-
-// function fetchRequirements(oncomplete?: () => void): void {
-//     useFetch({ url: "/config", method: HTTPMethod.get }, {
-//         oncomplete: (data) => config = data,
-//         onfinal: () => {
-//             drawTitle(config?.matkul, config?.kelas)
-//             if (timer) timer.remove()
-//             timer = initializeTimer(config?.end);
-//             drawAlert("Konfigurasi terupdate", 1);
-//             (oncomplete) && oncomplete()
-//         }
-//     })
-// }
 
 
 const renderSelectForm = (): void => {
@@ -143,7 +135,6 @@ const renderSelectForm = (): void => {
 //////////////////////////////////////////////////////////////
 
 window.onload = () => {
-    creatSocket()
     onDataRecived((data) => DrawMTableData(data))
     new DropZone({
         targetDiv: document.querySelector('#drop-zone') as HTMLDivElement,
@@ -161,9 +152,13 @@ window.onload = () => {
         mountEventListener()
         mountFileListener()
     })
-    // fetchRequirements(() => {
-
-    // })
+    drawTitle(config?.matkul, config?.kelas);
+    setTimeout(() => {
+        if(!config){
+            drawAlert("Gagal Fetching data Konfigurasi,harap refresh halaman");
+            window.location.reload()
+        }
+    }, 5000)
 }
 
 

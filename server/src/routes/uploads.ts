@@ -3,45 +3,56 @@ import path from "path";
 import useConfig, { getData, io, listData } from "../server";
 import multer from "multer"
 import fs from "fs"
-import writeLogs, { printLog } from "../utils/logHandler";
+import writeLogs, { createDirectory, printLog } from "../utils/logHandler";
 
 let upload = multer({ dest: path.join(__dirname, "temp/") })
 const routes = Router()
 
 interface data_interface { nim: string, name: string, file_name: string, kode_soal?: string | undefined, ip_pc?: number, file_data: FileList }
 
+
+routes.delete("/", (req, res) => {
+    if (listData.getAll().length === 0) return res.status(404)
+    if (!listData.get(req.body.nim)) return res.status(404)
+    fs.unlink(useConfig()!.dir + "\\" + listData.get(req.body.nim)?.file_name, (err) => {
+        if (err) {
+            printLog(err)
+            return res.status(500).end()
+        }
+        listData.remove(req.body.nim)
+        io.emit('data-upload', JSON.stringify(getData() ?? {}))
+        writeLogs(useConfig()!, listData.getAll())
+        res.status(200).end()
+    })
+})
+
+
 routes.post('/', upload.single("file-data"), async (req, res) => {
     if (!useConfig()) return res.status(501).send('Config Not yet Created');
     if (!req.file) return res.status(404).send('File not found');
 
-    const config = useConfig()
-    const { body }: { body: data_interface } = req
-    console.log(req.file)
-    if (listData.get(body.nim)) return res.status(403)
-    if (fs.existsSync(path.join(__dirname, "temp", req.file!.filename))) {
-        console.log(req.file)
-        if (!fs.existsSync(config!.dir)) {
-            fs.mkdir(config!.dir, { recursive: true }, (err) => {
-                if (err) {
-                    printLog(err)
-                    return res.status(500)
-                }
-            })
-        }
-        fs.copyFile(path.join(__dirname, "temp", req.file!.filename), getPath(body, req.file.originalname)[0], (err) => {
+    const config = useConfig();
+    const body: data_interface = req.body;
+    console.log("dah");
+    if (listData.get(body.nim)) return res.status(403).end()
+    console.log("dah");
+    createDirectory(path.join(__dirname, "temp", req.file!.filename)).then(data => {
+        if (!data) return res.status(500).end()
+        fs.copyFile(path.join(__dirname, "temp", req.file!.filename), getPath(body, req.file!.originalname)[0], (err) => {
             if (err) return res.status(500).send(err)
-            console.log("req")
             fs.unlink(path.join(__dirname, "temp", req.file!.filename), (err) => {
-                io.emit('data-upload', JSON.stringify(getData() ?? {}))
-                if (err) printLog("cannot delete " + path.join(__dirname, "temp", req.file!.filename))
-                listData.append({ file_name: getPath(body, req.file!.originalname)[1], date: Date.now(), name: body.name, nim: body.nim, })
+                res.status(200).json({ message: "Upload Berhasil" }).end();
+                if (err) printLog("cannot delete " + path.join(__dirname, "temp", req.file!.filename));
+                listData.append({ file_name: getPath(body, req.file!.originalname)[1], date: Date.now(), name: body.name, nim: body.nim, });
+                io.emit('data-upload', JSON.stringify(getData() ?? {}));
                 writeLogs(config!, listData.getAll());
-                return res.status(200)
+                return
             })
-        })
+        });
     }
-    return res.status(404).end()
+    )
 })
+
 
 
 const getPath = (data: data_interface, fileName: string): string[] => {
