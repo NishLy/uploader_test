@@ -3,24 +3,35 @@
   "version": "1.0.0",
   "description": "",
   "private": "true",
+  "type": "module",
   "scripts": {
     "dev": "nodemon --config nodemon.json",
     "serve": "nodemon ./build/server.js",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "ts-node ./src/App.ts",
+    "cli": "nodemon --config nodemon-cli.json"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/clear": "^0.1.2",
     "@types/express": "^4.17.14",
     "@types/express-fileupload": "^1.4.1",
+    "@types/figlet": "^1.5.5",
+    "@types/inquirer": "^9.0.3",
+    "@types/jsonwebtoken": "^9.0.1",
     "@types/multer": "^1.4.7",
     "@types/node": "^18.11.14",
     "body-parser": "^1.20.1",
+    "chalk": "^4.1.2",
+    "clear": "^0.1.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "express-jwt": "^8.4.0",
-    "multer": "^1.4.3",
+    "figlet": "^1.5.2",
+    "inquirer": "^9.1.4",
+    "jsonwebtoken": "^9.0.0",
+    "multer": "^1.4.4",
     "socket.io": "^4.5.4",
     "typescript": "^4.9.4"
   }

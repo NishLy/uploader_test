@@ -1,21 +1,25 @@
 /* Importing all the modules that are needed for the server to run. */
 import express from "express";
-import routesUpload from "./routes/uploads";
+import routesUpload from "./routes/upload";
 import routesAdmin from "./routes/admin";
 import bodyParser from "body-parser";
 import { DATA_JSON, UPLOADER_CONFIGURATION } from ".";
-import ListData from "./utils/dataHandler";
+import listDataMahasiswa from "./lib/mahasiswa";
 import { Server } from "socket.io"
 import http from "http"
 import ipValidation from "./midleware/ip";
+import chalk from "chalk";
+import figlet from "figlet";
+import dotenv from "dotenv"
 
 /* Creating a server and exporting it to be used in other files. */
+dotenv.config()
 const App = express()
 const server = http.createServer(App);
-export const io = new Server(server)
 const port = process.env.PORT || 3000
-export const listData = new ListData([]);
-let globalConfig: UPLOADER_CONFIGURATION | null = null
+let localConfig: UPLOADER_CONFIGURATION | null = null
+export const io = new Server(server)
+export const listData = new listDataMahasiswa([]);
 
 /**
  * It sets the globalConfig variable to the config parameter if it's not null, otherwise it sets it to
@@ -23,10 +27,10 @@ let globalConfig: UPLOADER_CONFIGURATION | null = null
  * @param {UPLOADER_CONFIGURATION | null} [config=null] - UPLOADER_CONFIGURATION | null = null
  * @returns The globalConfig is being returned.
  */
-export default function useConfig(config: UPLOADER_CONFIGURATION | null = null) {
-  globalConfig = config ?? globalConfig
+export function useConfig(config: UPLOADER_CONFIGURATION | null = null) {
+  localConfig = config ?? localConfig
   if (config === undefined) config === null
-  return globalConfig
+  return localConfig
 }
 
 /* It's setting up the routes for the server. */
@@ -68,7 +72,9 @@ export const getData = (): DATA_JSON | null => {
   }
 }
 
-server.listen({ port, host: '0.0.0.0' }, () => console.log("listening to port " + port),)
+export default function serve() {
+  server.listen({ port, host: '0.0.0.0' }, () => console.log(chalk.green(figlet.textSync("listening on port " + port))),)
+}
 
 
 

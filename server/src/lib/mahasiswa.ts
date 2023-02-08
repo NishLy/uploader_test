@@ -1,7 +1,7 @@
 import { DATA_INTERFACE } from "..";
 
 /* It's a class that manages an array of objects that have a property called nim. */
-class ListData {
+class listDataMahasiswa {
     private data: DATA_INTERFACE[];
     constructor(data: DATA_INTERFACE[]) {
         this.data = data
@@ -31,4 +31,4 @@ class ListData {
     }
 }
 
-export default ListData
+export default listDataMahasiswa
