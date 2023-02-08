@@ -2,7 +2,6 @@ import { Router } from "express";
 import path from "path";
 import { getData, io, listData, useConfig } from "../server";
 import multer from "multer"
-import fs from "fs"
 import writeJSON from "../utils/logHandler";
 import { copyFileAsync, createDirectoryAsync, deleteFileAsync } from "../lib/file";
 
@@ -12,16 +11,17 @@ const routes = Router()
 interface data_interface { nim: string, name: string, file_name: string, kode_soal?: string | undefined, ip_pc?: number, file_data: FileList }
 
 /* A function that is called when the user wants to delete a file. */
-routes.delete("/", (req, res) => {
+routes.delete("/", async (req, res) => {
     if (listData.getAll().length === 0 || !listData.get(req.body.nim)) return res.status(404)
     /* Deleting a file. */
-    fs.unlink(useConfig()!.dir + "\\" + listData.get(req.body.nim)?.file_name, (err) => {
-        if (err) return res.status(500).end()
-        listData.remove(req.body.nim)
-        io.emit('data-upload', JSON.stringify(getData() ?? {}))
-        writeJSON(useConfig()!, listData.getAll())
-        res.status(200).end()
-    })
+    await deleteFileAsync(useConfig()!.dir + "\\" + listData.get(req.body.nim)?.file_name).catch(err => { return res.status(500).send(err) })
+
+    listData.remove(req.body.nim)
+    io.emit('data-upload', JSON.stringify(getData() ?? {}))
+    writeJSON(useConfig()!, listData.getAll())
+
+    return res.status(200).json({ message: "deleted successfuly" })
+
 })
 
 //* A function that is called when the user uploads a file. */
@@ -45,7 +45,6 @@ routes.post('/', upload.single("file-data"), async (req, res) => {
     /* Copying a file from one location to another. */
     await copyFileAsync("./uploads/" + req.file!.filename, getPath(body, req.file!.originalname)[0]).catch(err => { return res.status(500).send(err) })
 
-    res.status(200).json({ message: "Upload Berhasil" }).end();
     /* Deleting the file. */
     await deleteFileAsync("./uploads/" + req.file!.filename).catch(err => { return res.status(500).send(err) })
 
@@ -53,6 +52,9 @@ routes.post('/', upload.single("file-data"), async (req, res) => {
     listData.append({ file_name: getPath(body, req.file!.originalname)[1], date: Date.now(), name: body.name, nim: body.nim, });
     io.emit('data-upload', JSON.stringify(getData() ?? {}));
     writeJSON(config!, listData.getAll());
+
+    /* Returning a response to the client. */
+    return res.status(200).json({ message: "Upload Berhasil" }).end();
 })
 
 

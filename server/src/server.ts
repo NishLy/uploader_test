@@ -11,6 +11,7 @@ import ipValidation from "./midleware/ip";
 import chalk from "chalk";
 import figlet from "figlet";
 import dotenv from "dotenv"
+import clear from "clear";
 
 /* Creating a server and exporting it to be used in other files. */
 dotenv.config()
@@ -72,7 +73,11 @@ export const getData = (): DATA_JSON | null => {
   }
 }
 
+/**
+ * This function starts a server on port 3000 | process.env.PORT and prints a message to the console when it's ready.
+ */
 export default function serve() {
+  clear()
   server.listen({ port, host: '0.0.0.0' }, () => console.log(chalk.green(figlet.textSync("listening on port " + port))),)
 }
 

@@ -12,13 +12,15 @@ dotenv.config()
  * middleware is done.
  * @returns The user object is being returned.
  */
-export default function authenticateToken(req: Request, res: Response, next: NextFunction) {
+export default function authenticateToken(req: Request, res: Response, next: NextFunction): void | Response {
     const authHader = req.headers['authorization']
     const token = authHader?.split(' ')[1]
+
     if (!token || token === "undefined") return res.sendStatus(401)
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string, (err, user) => {
         if (err) return res.status(403).json({ message: "token expired" })
         if (user) req.body = { ...req.body, ...user as object }
-        next()
+        return next()
     })
+    return next()
 }

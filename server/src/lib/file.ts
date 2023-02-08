@@ -74,7 +74,6 @@ export const readFilesNameAsync = (path: string): Promise<string[] | null> => {
     });
 }
 
-
 /**
  * It copies a file from one location to another
  * @param {string} src - The source file path
@@ -83,7 +82,7 @@ export const readFilesNameAsync = (path: string): Promise<string[] | null> => {
  */
 export const copyFileAsync = (src: string, dest: string): Promise<boolean> => {
     return new Promise((resolve, rejects) => {
-        if (!fs.existsSync(src)) return null
+        if (!fs.existsSync(src)) return rejects(null)
         fs.copyFile(src, dest, (err) => {
             if (!err) resolve(true)
             rejects(err)
@@ -91,6 +90,12 @@ export const copyFileAsync = (src: string, dest: string): Promise<boolean> => {
     })
 }
 
+/**
+ * It deletes a file at the given path, and returns a promise that resolves to true if the file was
+ * deleted, or rejects with an error if the file could not be deleted
+ * @param {string} path - The path to the file you want to delete.
+ * @returns A promise that resolves to a boolean.
+ */
 export const deleteFileAsync = (path: string): Promise<boolean> => {
     return new Promise((resolve, rejects) => {
         if (!fs.existsSync(path)) rejects(null)

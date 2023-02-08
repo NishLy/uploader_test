@@ -1,12 +1,12 @@
 # Ignore node_modules folder
 node_modules
+uploads
 
 # Ignore all text files
 *.txt
+config.json
 
 # Ignore files related to API keys
 .env
 
-uploads
 
-config.json
