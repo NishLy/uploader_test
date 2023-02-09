@@ -3,8 +3,7 @@ import express from "express";
 import routesUpload from "./routes/upload";
 import routesAdmin from "./routes/admin";
 import bodyParser from "body-parser";
-import { DATA_JSON, UPLOADER_CONFIGURATION } from ".";
-import listDataMahasiswa from "./lib/mahasiswa";
+import listData from "./lib/list";
 import { Server } from "socket.io"
 import http from "http"
 import ipValidation from "./midleware/ip";
@@ -12,6 +11,9 @@ import chalk from "chalk";
 import figlet from "figlet";
 import dotenv from "dotenv"
 import clear from "clear";
+import { UPLOADER_CONFIGURATION } from "./interfaces/configuration";
+import { DATA_JSON } from "./interfaces/data";
+
 
 /* Creating a server and exporting it to be used in other files. */
 dotenv.config()
@@ -20,7 +22,7 @@ const server = http.createServer(App);
 const port = process.env.PORT || 3000
 let localConfig: UPLOADER_CONFIGURATION | null = null
 export const io = new Server(server)
-export const listData = new listDataMahasiswa([]);
+export const listUpload = new listData([]);
 
 /**
  * It sets the globalConfig variable to the config parameter if it's not null, otherwise it sets it to
@@ -69,7 +71,7 @@ export const getData = (): DATA_JSON | null => {
     last_fetched: Date.now(),
     kelas: useConfig()?.kelas ?? "undefined",
     matkul: useConfig()?.matkul ?? "undefined",
-    data: listData.getAll()
+    data: listUpload.getAll()
   }
 }
 

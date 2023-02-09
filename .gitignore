@@ -1,6 +1,7 @@
 # Ignore node_modules folder
 node_modules
 uploads
+build
 
 # Ignore all text files
 *.txt

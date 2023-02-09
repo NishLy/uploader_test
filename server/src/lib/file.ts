@@ -1,23 +1,23 @@
 import fs from "fs"
 
 /**
- * It creates a directory if it doesn't exist
+ * This function creates a directory if it doesn't exist, and returns a promise that resolves to true
+ * if the directory was created or already exists, or false if the directory couldn't be created.
  * @param {string} path - The path to the directory you want to create.
  * @returns A promise that resolves to a boolean.
  */
 export const createDirectoryAsync = (path: string): Promise<boolean> => {
     return new Promise<boolean>((resolve, reject) => {
-        if (!fs.existsSync(path)) {
-            fs.mkdir(path, (err) => {
-                if (err) reject(false);
-            })
-        }
-        resolve(true)
+        if (fs.existsSync(path)) return resolve(true)
+        fs.mkdir(path, { recursive: true }, (err) => {
+            if (err) return reject(err);
+            resolve(true)
+        })
     })
 }
 
 /**
- * It returns a promise that resolves to the data read from the file at the given path.
+ * It returns a promise that resolves to the data read from the file at the given path
  * @param {string} path - The path to the file you want to read.
  * @returns A promise that resolves to the data read from the file.
  */
@@ -30,12 +30,12 @@ export const readFileAsync = (path: string) => {
     })
 }
 
-
-
 /**
- * It writes a file to the specified path with the specified data
+ * It takes a path and data as arguments and returns a promise that resolves to true if the file was
+ * written successfully or rejects with an error if it wasn't
  * @param {string} path - string - The path to the file you want to write to.
- * @param {any} data - any - The data to write to the file.
+ * @param {any} data - any - This is the data that you want to write to the file.
+ * @returns A promise that resolves to a boolean or rejects with an error.
  */
 export const writeFileAsync = (path: string, data: any): Promise<string | boolean> => {
     return new Promise((resolve, rejects) => {
@@ -47,6 +47,14 @@ export const writeFileAsync = (path: string, data: any): Promise<string | boolea
 
 }
 
+/**
+ * It takes a path and data as arguments and returns a promise that resolves to true if the file was
+ * appended successfully or rejects with an error if it wasn't
+ * @param {string} path - The path to the file you want to append to.
+ * @param {any} data - The data to write. If something other than a Buffer or Uint8Array is provided,
+ * the value is coerced to a string.
+ * @returns A promise that resolves to a string or boolean.
+ */
 export const appendFileAsync = (path: string, data: any): Promise<string | boolean> => {
     return new Promise((resolve, rejects) => {
         fs.appendFile(path, data, (err: any) => {

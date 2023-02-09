@@ -4,13 +4,15 @@ import chalk from "chalk";
 import figlet from "figlet";
 import { appendFileAsync, readFileAsync, writeFileAsync } from "./lib/file";
 import inquirer, { QuestionCollection } from "inquirer";
-import fs from "fs"
+import fs, { writeFileSync } from "fs"
 import crypto from "crypto"
 import serve, { useConfig } from "./server";
 import { parseConfigLogs } from "./utils/parseJSON";
+import printLog, { LOGTYPE } from "./lib/logger";
 
 interface GLOBAL_CONFIG {
-    last_config_dir: string, lab: string, last_open: number, ipvalidation: boolean, list_allowed_ip: string[]
+    logToConsole?: boolean;
+    last_config_dir: string, lab: string, last_open: number, ipvalidation?: boolean, list_allowed_ip: string[]
 }
 
 (async function () {
@@ -26,26 +28,22 @@ interface GLOBAL_CONFIG {
 
 
     /* Asking for a password. */
-    const { ipvalidation } = await inquirer.prompt(<QuestionCollection>[
+    await inquirer.prompt(<QuestionCollection>[
         {
             name: 'passwordlab',
             type: 'password',
             message: 'Masukan Password uploader',
             validate(input) {
-                if (input !== "upt2022") return "Password Salah!"
+                if (input !== "upt") return "Password Salah!"
                 return true
             }
-        }, {
-            name: 'ipvalidation',
-            type: 'confirm',
-            message: 'Hidupkan validasi IP?',
-        }])
+        },]).catch(err => printLog(err, LOGTYPE.warning));
 
     /* It checks if the file exists. If it doesn't, it calls the function createNewConfig(). */
-    if (!fs.existsSync("./config.json")) return createNewConfig(ipvalidation)
+    if (!fs.existsSync("./config.json")) return createNewConfig()
 
     const config: GLOBAL_CONFIG = await JSON.parse(await readFileAsync("./config.json") as string);
-    config.ipvalidation = ipvalidation
+
 
     /* It checks if the file exists. If it doesn't, it calls the function createNewConfig(). */
     if (config.last_config_dir === "" || !fs.existsSync(config.last_config_dir + "\\log.json")) {
@@ -63,7 +61,7 @@ interface GLOBAL_CONFIG {
                 if (input !== "upt2022") return "Password Salah!"
                 return true
             },
-        }])
+        }]).catch(err => printLog(err, LOGTYPE.warning));
 
     /* Checking if the file exists. If it doesn't, it calls the function createNewConfig(). */
     if (!confirm.confirmReplace) return serve()
@@ -79,7 +77,7 @@ interface GLOBAL_CONFIG {
  * called serve().
  * @returns the result of the serve() function.
  */
-async function createNewConfig(ipvalidation: boolean) {
+async function createNewConfig() {
     /* Asking the user to select a lab, then writes the user's selection to a file, then runs a function
      * called serve(). */
     let config = await inquirer.prompt([
@@ -88,6 +86,16 @@ async function createNewConfig(ipvalidation: boolean) {
             type: 'rawlist',
             message: 'Pilih Lab :',
             choices: ["LAB1", "LAB2", "LAB3", "LAB4", "LAB5", "LAB6", "LAB7"],
+        },
+        {
+            name: 'ipvalidation',
+            type: 'confirm',
+            message: 'Hidupkan validasi IP?',
+        },
+        {
+            name: 'logToConsole',
+            type: 'confirm',
+            message: 'Hidupkan verbose logging?',
         },
         {
             name: 'port',
@@ -99,11 +107,11 @@ async function createNewConfig(ipvalidation: boolean) {
                 return true
             }
         }
-    ]).catch(err => console.log(err));
+    ]).catch(err => printLog(err, LOGTYPE.warning));
 
     await appendFileAsync('.env', "\nPORT=" + config.port === "" ? "3000" : config.port)
     const { allowedIp } = await JSON.parse(await readFileAsync("./assets/ip.json") as string)
-    const globalConfig: GLOBAL_CONFIG = { last_config_dir: "", lab: config.lab, last_open: Date.now(), ipvalidation, list_allowed_ip: allowedIp[config.lab] }
+    const globalConfig: GLOBAL_CONFIG = { logToConsole: config.logToConsole, last_config_dir: "", lab: config.lab, last_open: Date.now(), list_allowed_ip: allowedIp[config.lab] }
     useGlobalConfig(globalConfig)
     writeGlobalConfig(globalConfig)
     return serve()
@@ -115,7 +123,7 @@ async function createNewConfig(ipvalidation: boolean) {
  * @param {GLOBAL_CONFIG} config - GLOBAL_CONFIG
  */
 function writeGlobalConfig(config: GLOBAL_CONFIG) {
-    writeFileAsync("./config.json", JSON.stringify(config)).catch(err => console.log(err))
+    writeFileSync("./config.json", JSON.stringify(config))
 }
 
 /**

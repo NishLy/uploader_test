@@ -1,9 +1,10 @@
 import { Router } from "express";
 import path from "path";
-import { getData, io, listData, useConfig } from "../server";
+import { getData, io, listUpload, useConfig } from "../server";
 import multer from "multer"
 import writeJSON from "../utils/logHandler";
 import { copyFileAsync, createDirectoryAsync, deleteFileAsync } from "../lib/file";
+import printLog, { LOGTYPE } from "../lib/logger";
 
 let upload = multer({ dest: "./uploads/" })
 const routes = Router()
@@ -12,13 +13,17 @@ interface data_interface { nim: string, name: string, file_name: string, kode_so
 
 /* A function that is called when the user wants to delete a file. */
 routes.delete("/", async (req, res) => {
-    if (listData.getAll().length === 0 || !listData.get(req.body.nim)) return res.status(404)
+    if (listUpload.getAll().length === 0 || !listUpload.get(req.body.nim)) return res.status(404)
     /* Deleting a file. */
-    await deleteFileAsync(useConfig()!.dir + "\\" + listData.get(req.body.nim)?.file_name).catch(err => { return res.status(500).send(err) })
+    await deleteFileAsync(useConfig()!.dir + "\\" + listUpload.get(req.body.nim)?.file_name)
+        .catch(err => {
+            printLog(err, LOGTYPE.failed)
+            return res.status(500).send(err)
+        })
 
-    listData.remove(req.body.nim)
+    listUpload.remove(req.body.nim)
     io.emit('data-upload', JSON.stringify(getData() ?? {}))
-    writeJSON(useConfig()!, listData.getAll())
+    writeJSON(useConfig()!, listUpload.getAll())
 
     return res.status(200).json({ message: "deleted successfuly" })
 
@@ -35,23 +40,35 @@ routes.post('/', upload.single("file-data"), async (req, res) => {
     const body: data_interface = req.body;
 
     /* Checking if the user has already uploaded a file. */
-    if (listData.get(body.nim)) return res.status(403).end()
+    if (listUpload.get(body.nim)) return res.status(403).end()
 
-    const data = await createDirectoryAsync("./uploads/" + req.file!.filename).catch(err => { return res.status(500).send(err) })
+    const data = await createDirectoryAsync("./uploads/" + req.file!.filename)
+        .catch(err => {
+            printLog(err, LOGTYPE.failed)
+            return res.status(500).send(err)
+        })
 
     /* Checking if the data is not null. */
     if (!data) return res.status(500).end()
 
     /* Copying a file from one location to another. */
-    await copyFileAsync("./uploads/" + req.file!.filename, getPath(body, req.file!.originalname)[0]).catch(err => { return res.status(500).send(err) })
+    await copyFileAsync("./uploads/" + req.file!.filename, getPath(body, req.file!.originalname)[0])
+        .catch(err => {
+            printLog(err, LOGTYPE.failed)
+            return res.status(500).send(err)
+        })
 
     /* Deleting the file. */
-    await deleteFileAsync("./uploads/" + req.file!.filename).catch(err => { return res.status(500).send(err) })
+    await deleteFileAsync("./uploads/" + req.file!.filename)
+        .catch(err => {
+            printLog(err, LOGTYPE.failed);
+            return res.status(500).send(err)
+        })
 
     /* Adding the data to the listData object. */
-    listData.append({ file_name: getPath(body, req.file!.originalname)[1], date: Date.now(), name: body.name, nim: body.nim, });
+    listUpload.append({ file_name: getPath(body, req.file!.originalname)[1], date: Date.now(), name: body.name, nim: body.nim, });
     io.emit('data-upload', JSON.stringify(getData() ?? {}));
-    writeJSON(config!, listData.getAll());
+    writeJSON(config!, listUpload.getAll());
 
     /* Returning a response to the client. */
     return res.status(200).json({ message: "Upload Berhasil" }).end();

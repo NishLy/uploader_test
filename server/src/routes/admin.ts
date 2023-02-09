@@ -1,12 +1,11 @@
-import { Response, Router } from "express"
-import { UPLOADER_CONFIGURATION } from ".."
-import { getData, io, listData, useConfig } from "../server"
+import { Router } from "express"
+import { getData, io, listUpload, useConfig } from "../server"
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv"
+import { UPLOADER_CONFIGURATION } from "../interfaces/configuration"
 import fs from "fs"
 import authenticateToken from "../midleware/authentication";
 import writeJSON from "../utils/logHandler";
-import { readFileAsync } from "../lib/file";
 import { parseDataLogs } from "../utils/parseJSON";
 import useGlobalConfig from "../App";
 
@@ -30,23 +29,23 @@ routes.post('/login', async (req, res) => {
 })
 
 /* A route that is used to update the configuration of the application. */
-routes.post('/config', authenticateToken, async (req, res) => {
+routes.post('/config', authenticateToken, (req, res) => {
     /* A function that is used to update the configuration of the application. */
     useConfig(req.body as UPLOADER_CONFIGURATION)
 
     /* Checking if the log.json file exists in the directory specified in the configuration. If it does
     not exist, it will create it. */
-    if (!fs.existsSync(useConfig()!.dir + "\\log.json")) {
-        await writeJSON(useConfig()!)
-    }
+    if (!fs.existsSync(useConfig()!.dir + "\\log.json")) writeJSON(useConfig()!)
 
-    const json = await readFileAsync(useConfig()!.dir + "\\log.json")
-    listData.setAll(parseDataLogs(json))
-    writeJSON(useConfig()!, listData.getAll())
+    const json = fs.readFileSync(useConfig()!.dir + "\\log.json")
+    console.log("sad")
+
+    listUpload.setAll(parseDataLogs(json))
+    writeJSON(useConfig()!, listUpload.getAll())
     useGlobalConfig({ ...useGlobalConfig()!, lab: useGlobalConfig()!.lab, last_config_dir: useConfig()!.dir, last_open: Date.now() })
     io.emit('config', JSON.stringify(useConfig()))
-    io.emit('data-upload', JSON.stringify(getData() ?? {}), (response: Response) => console.log(response))
-    res.status(200).json({ message: "updated" }).end()
+    io.emit('data-upload', JSON.stringify(getData() ?? {}))
+    res.status(200).json({ message: "updated" })
 })
 
 

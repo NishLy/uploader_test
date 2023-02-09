@@ -1,3 +1,8 @@
+/**
+ * It takes a JSON object, deletes some properties, and returns the remaining properties
+ * @param {any} json - any
+ * @returns The data is being returned as a string.
+ */
 export function parseConfigLogs(json: any) {
     if (!json) return null
     const data = JSON.parse(json)
@@ -18,6 +23,6 @@ export function parseConfigLogs(json: any) {
  */
 export function parseDataLogs(json: any) {
     if (!json) return null
-    const data = JSON.parse(json) ?? null
+    const data = JSON.parse(json)
     return data?.data
 }

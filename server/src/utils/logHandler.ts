@@ -1,6 +1,7 @@
-import { UPLOADER_CONFIGURATION, DATA_INTERFACE } from ".."
-import { createDirectoryAsync, writeFileAsync } from "../lib/file"
-
+import { DATA_INTERFACE } from "../interfaces/data"
+import { UPLOADER_CONFIGURATION } from "../interfaces/configuration"
+import { createDirectoryAsync } from "../lib/file"
+import fs from "fs"
 
 /**
  * This function takes a configuration object and an optional array of data objects and writes the
@@ -12,7 +13,11 @@ import { createDirectoryAsync, writeFileAsync } from "../lib/file"
 const writeLogUploader = async (config: UPLOADER_CONFIGURATION, data?: DATA_INTERFACE[]) => {
     const logConfig = { ...config, last_modified: new Date().getTime(), data: data ?? [] }
     await createDirectoryAsync(config.dir)
-    return writeFileAsync(config.dir + "\\log.json", JSON.stringify(logConfig))
+        .catch(err => {
+            console.log(err)
+        })
+    console.log(fs.existsSync(config.dir + "\\log.json"))
+    return fs.writeFileSync(config.dir + "\\log.json", JSON.stringify(logConfig))
 }
 
 // /**
