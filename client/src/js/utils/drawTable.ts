@@ -1,13 +1,20 @@
-import { DATA_JSON, DATA_INTERFACE } from "../..";
+import { DATA_INTERFACE } from "../..";
 import { drawAlert } from "./drawAlert";
-import useFetch, { HTTPMethod } from "./useFetch";
+import useFetch, { HTTP } from "../lib/useFetch";
+
 let last_draw: number;
 
+/**
+ * It will draw a table with the data from the server
+ * @param  - last_fetched is the time when the data was fetched from the server
+ * @returns Nothing.
+ */
 export default function DrawMTableData({ last_fetched, data, isLoged = false }: { last_fetched: number, data: DATA_INTERFACE[], isLoged?: boolean }): void {
     const table = document.querySelector('#main-data-table')
+
     console.log(data)
-    table.innerHTML = ""
-    table.innerHTML = `<tr><th>No</th><th>NIM</th><th>Nama</th><th>Nama File</th><th>Tanggal</th><th>Aksi</th></tr>`
+    table!.innerHTML = ""
+    table!.innerHTML = `<tr><th>No</th><th>NIM</th><th>Nama</th><th>Nama File</th><th>Tanggal</th><th>Aksi</th></tr>`
 
     if (!last_fetched) return
     if (data.length === 0) return
@@ -15,11 +22,42 @@ export default function DrawMTableData({ last_fetched, data, isLoged = false }: 
 
     data.forEach((element: DATA_INTERFACE, index) => {
         const tr = document.createElement('tr')
-        table.appendChild(drawTr(tr, index, element, isLoged))
+        table!.appendChild(drawTr(tr, index, element, isLoged))
     });
 
 }
 
+/**
+ * It takes a table row element, an index, an element, and a boolean, and returns a table row element.
+ * 
+ * The function is called with the following arguments:
+ * 
+ *     drawTr(tr, index, element, isLoged)
+ * 
+ * The first argument is a table row element, the second is a number, the third is an object, and the
+ * fourth is a boolean.
+ * 
+ * The function returns a table row element.
+ * 
+ * The function is called with the following arguments:
+ * 
+ *     drawTr(tr, index, element, isLoged)
+ * 
+ * The first argument is a table row element, the second is a number, the third is an object, and the
+ * fourth is a boolean.
+ * 
+ * The function returns a table row element.
+ * 
+ * The function is called with the following arguments:
+ * 
+ *     drawTr(
+ * @param {HTMLTableRowElement} tr - HTMLTableRowElement, index: number, element: DATA_INTERFACE,
+ * isLoged: boolean = false
+ * @param {number} index - The index of the current element being processed in the array.
+ * @param {DATA_INTERFACE} element - DATA_INTERFACE
+ * @param {boolean} [isLoged=false] - boolean = false
+ * @returns A function that takes 3 parameters and returns a tr element.
+ */
 const drawTr = (tr: HTMLTableRowElement, index: number, element: DATA_INTERFACE, isLoged: boolean = false) => {
     if (index % 2 === 0) tr.className = "bg-blue-500"
     else tr.className = "bg-slate-500"
@@ -50,7 +88,7 @@ const drawTr = (tr: HTMLTableRowElement, index: number, element: DATA_INTERFACE,
         td.innerHTML = "<button class='bg-red-500 px-2 py-1 rounded-md'>Hapus</button> "
         td.addEventListener('click', () => {
             if (!confirm("Hapus data milik " + element.nim + " ?")) return
-            useFetch({ url: '/upload/', method: HTTPMethod.delete, body: JSON.stringify({ nim: element.nim }) }, { oncomplete: () => drawAlert("Data milik " + element.nim + " terhapus") })
+            useFetch({ url: '/upload/', method: HTTP.delete, body: JSON.stringify({ nim: element.nim }) }, { onCompleted: () => drawAlert("Data milik " + element.nim + " terhapus") })
         })
     }
     tr.appendChild(td)

@@ -1,4 +1,5 @@
-declare interface DropZoneInterface {
+/* It's a class that takes a div element and adds event listeners to it. */
+interface DropZoneInterface {
     targetDiv: HTMLElement | HTMLDivElement
     // inputElemet: HTMLInputElement
     callbackClose?: (param: any) => void
@@ -7,6 +8,7 @@ declare interface DropZoneInterface {
     callbackLeave?: (param: any) => void
 }
 
+/* It's a class that takes a div element and adds event listeners to it. */
 export default class DropZone {
     private targetDiv: HTMLElement | HTMLDivElement
     // private inputElemet: HTMLInputElement

@@ -9,7 +9,9 @@ export const onDataRecived = (onrecived: (param: any) => void) => {
         if (Object.keys(data).length === 0) return
         if (onrecived) onrecived(data)
         if (callback) callback("data received at " + new Date().toTimeString())
+        return
     })
+    return
 }
 
 export const onConfigRecived = (onrecived: (param: any) => void) => {
@@ -19,5 +21,7 @@ export const onConfigRecived = (onrecived: (param: any) => void) => {
         if (Object.keys(data).length === 0) return
         if (onrecived) onrecived(data)
         if (callback) callback("config received at " + new Date().toTimeString())
+        return
     })
+    return
 }

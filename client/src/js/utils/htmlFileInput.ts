@@ -25,14 +25,15 @@ export default class FileInput {
     }
 
     fileValidition() {
-        if (this.inputElement.files?.length === 0) return drawAlert("Belum ada file!")
-        if (this.requirments.file_types.length === 0) return drawAlert("Belum Konfigurasi File Requirments!")
+        if (this.inputElement.files?.length === 0) return drawAlert("Belum ada file!", 2)
+        if (this.requirments.file_types.length === 0) return drawAlert("Belum Konfigurasi File Requirments!", 2)
 
-        if (-1 === this.requirments.file_types.indexOf(this.inputElement.files![0].type)) return drawAlert(`Format File Tidak Didukung ${this.inputElement.files![0].type}`)
+        if (-1 === this.requirments.file_types.indexOf(this.inputElement.files![0].type)) return drawAlert(`Format File Tidak Didukung ${this.inputElement.files![0].type}`, 2)
         console.log(this.requirments.max_size, this.inputElement.files![0].size)
-        if (this.requirments.max_size < this.inputElement.files![0].size) return drawAlert("Ukuran File Terlalu Besar")
+        if (this.requirments.max_size < this.inputElement.files![0].size) return drawAlert("Ukuran File Terlalu Besar > " + this.requirments.max_size / 1000000 + "MB", 2)
 
-        this.onvalidCallback(this.inputElement.files![0])
+        return this.onvalidCallback(this.inputElement.files![0])
+
     }
 
     resetInput() {

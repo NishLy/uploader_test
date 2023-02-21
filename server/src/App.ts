@@ -132,7 +132,9 @@ function writeGlobalConfig(config: GLOBAL_CONFIG) {
  * @param {GLOBAL_CONFIG | null} [config=null] - GLOBAL_CONFIG | null = null
  * @returns The globalConfig variable is being returned.
  */
-let globalConfig: GLOBAL_CONFIG | null = null
+let globalConfig: GLOBAL_CONFIG | null = {
+    lab: "LAB2", last_config_dir: "", last_open: Date.now(), list_allowed_ip: ["127.0.0.1"], ipvalidation: true, logToConsole: true
+}
 export default function useGlobalConfig(config: GLOBAL_CONFIG | null = null) {
     if (config) {
         globalConfig = config;

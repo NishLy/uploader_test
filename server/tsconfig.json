@@ -99,7 +99,7 @@
   "include": [
     "src/**/*.ts",
     "tests/**/*.ts"
-  ],
+, "src/controller/admin"  ],
   "exclude": [
     "node_modules"
   ]

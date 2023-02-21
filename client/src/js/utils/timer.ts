@@ -2,9 +2,9 @@ export default class Timer {
     private current: Date | null = null
     private intervalDate: any
     private endTimer: Date
-    private drawTarget: HTMLElement | null = null
+    private drawTarget: Element | null = null
 
-    constructor(date: Date, target: HTMLElement | null = null) {
+    constructor(date: Date, target: Element | null = null) {
         this.endTimer = date
         this.drawTarget = target
         this.intervalDate = setInterval(() => this.update(), 1000)

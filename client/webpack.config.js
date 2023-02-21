@@ -14,11 +14,12 @@ module.exports = {
   },
   watchOptions: {
     aggregateTimeout: 1000,
-    ignored: ["**/dist", "**/node_modules"],
+    ignored: ["**/dist", "**/node_modules","**/build"],
   },
   output: {
     filename: "[name].bundle.js",
-    path: path.resolve(__dirname, "build"),
+    // publicPath: "/build/",
+    path: path.join(__dirname, "build"),
   },
   plugins: [
     new HtmlWebpackPlugin({

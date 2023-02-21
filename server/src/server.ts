@@ -30,14 +30,14 @@ export const listUpload = new listData([]);
  * @param {UPLOADER_CONFIGURATION | null} [config=null] - UPLOADER_CONFIGURATION | null = null
  * @returns The globalConfig is being returned.
  */
-export function useConfig(config: UPLOADER_CONFIGURATION | null = null) {
+export function useConfig(config: UPLOADER_CONFIGURATION | null = null, flash = false) {
   localConfig = config ?? localConfig
-  if (config === undefined) config === null
+  if (flash) localConfig = null
   return localConfig
 }
 
 /* It's setting up the routes for the server. */
-App.use(express.static('../client/dist'))
+App.use(express.static('../client/build'))
 App.use(bodyParser.json());
 App.use(ipValidation)
 App.use('/upload', routesUpload)
@@ -45,7 +45,7 @@ App.use('/admin', routesAdmin)
 
 /* It's serving the index.html file from the client/dist folder. */
 App.get('/', (_, res) => {
-  res.sendFile('index.html', { root: '../client/dist' })
+  res.sendFile('index.html', { root: '../client/build/' })
 })
 
 /* It's getting the config from the server. */
@@ -83,6 +83,4 @@ export default function serve() {
   server.listen({ port, host: '0.0.0.0' }, () => console.log(chalk.green(figlet.textSync("listening on port " + port))),)
 }
 
-
-
-
+// export default server;
