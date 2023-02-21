@@ -37,7 +37,7 @@ export function useConfig(config: UPLOADER_CONFIGURATION | null = null, flash = 
 }
 
 /* It's setting up the routes for the server. */
-App.use(express.static('../client/build'))
+App.use(express.static('./dist/'))
 App.use(bodyParser.json());
 App.use(ipValidation)
 App.use('/upload', routesUpload)
@@ -45,7 +45,7 @@ App.use('/admin', routesAdmin)
 
 /* It's serving the index.html file from the client/dist folder. */
 App.get('/', (_, res) => {
-  res.sendFile('index.html', { root: '../client/build/' })
+  res.sendFile('index.html', { root: './dist/' })
 })
 
 /* It's getting the config from the server. */

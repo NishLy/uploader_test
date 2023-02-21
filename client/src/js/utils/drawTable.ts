@@ -1,6 +1,7 @@
 import { DATA_INTERFACE } from "../..";
 import { drawAlert } from "./drawAlert";
-import useFetch, { HTTP } from "../lib/useFetch";
+import { HTTP } from "../lib/useFetch";
+import xhrRequest from "../lib/xhrrequest";
 
 let last_draw: number;
 
@@ -12,7 +13,6 @@ let last_draw: number;
 export default function DrawMTableData({ last_fetched, data, isLoged = false }: { last_fetched: number, data: DATA_INTERFACE[], isLoged?: boolean }): void {
     const table = document.querySelector('#main-data-table')
 
-    console.log(data)
     table!.innerHTML = ""
     table!.innerHTML = `<tr><th>No</th><th>NIM</th><th>Nama</th><th>Nama File</th><th>Tanggal</th><th>Aksi</th></tr>`
 
@@ -88,7 +88,12 @@ const drawTr = (tr: HTMLTableRowElement, index: number, element: DATA_INTERFACE,
         td.innerHTML = "<button class='bg-red-500 px-2 py-1 rounded-md'>Hapus</button> "
         td.addEventListener('click', () => {
             if (!confirm("Hapus data milik " + element.nim + " ?")) return
-            useFetch({ url: '/upload/', method: HTTP.delete, body: JSON.stringify({ nim: element.nim }) }, { onCompleted: () => drawAlert("Data milik " + element.nim + " terhapus") })
+            xhrRequest({
+                url: '/upload/', method: HTTP.delete, body: JSON.stringify({ nim: element.nim }),
+                headers: [{ name: "Content-Type", value: "application/json" }]
+            })
+            .then(_data=>  drawAlert("berhasil menghapus data milik " + element.nim,1))
+            .catch(_err => drawAlert("gagal menghapus data!",3))
         })
     }
     tr.appendChild(td)

@@ -2,6 +2,8 @@
 node_modules
 uploads
 build
+coverage
+.vscode
 
 # Ignore all text files
 *.txt

@@ -1,7 +1,7 @@
 import { DATA_INTERFACE } from "../interfaces/data"
 import { UPLOADER_CONFIGURATION } from "../interfaces/configuration"
-import { createDirectoryAsync } from "../lib/file"
 import fs from "fs"
+import printLog, { LOGTYPE } from "../lib/logger"
 
 /**
  * This function takes a configuration object and an optional array of data objects and writes the
@@ -12,11 +12,9 @@ import fs from "fs"
  */
 const writeLogUploader = async (config: UPLOADER_CONFIGURATION, data?: DATA_INTERFACE[]) => {
     const logConfig = { ...config, last_modified: new Date().getTime(), data: data ?? [] }
-    await createDirectoryAsync(config.dir)
-        .catch(err => {
-            console.log(err)
-        })
-    console.log(fs.existsSync(config.dir + "\\log.json"))
+
+    if (fs.mkdirSync(config.dir, { recursive: true })) printLog("gagal membuat log.json pada path : " + config.dir, LOGTYPE.failed)
+
     return fs.writeFileSync(config.dir + "\\log.json", JSON.stringify(logConfig))
 }
 

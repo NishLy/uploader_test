@@ -76,7 +76,7 @@ export const uploadFileController = async (req: Request, res: Response) => {
     listUpload.append({ file_name: getPath(body, req.file!.originalname)[1], date: Date.now(), name: body.name, nim: body.nim, });
     io.emit('data-upload', JSON.stringify(getData() ?? {}));
     writeJSON(config!, listUpload.getAll());
-
+    printLog(`{nim : ${body.nim} successfuly upload file }`,LOGTYPE.success)
     /* Returning a response to the client. */
     return res.status(200).json({ message: "Upload Berhasil" }).end();
 }
@@ -95,6 +95,7 @@ export const deleteFileController = async (req: Request, res: Response) => {
     listUpload.remove(req.body.nim)
     io.emit('data-upload', JSON.stringify(getData() ?? {}))
     writeJSON(useConfig()!, listUpload.getAll())
+    printLog(`{nim : ${req.body.nim} successfuly delete file }`,LOGTYPE.success)
 
     return res.status(200).json({ message: "deleted successfuly" })
 }

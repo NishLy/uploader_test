@@ -11,7 +11,7 @@ export const createDirectoryAsync = (path: string): Promise<boolean> => {
         if (fs.existsSync(path)) return resolve(true)
         fs.mkdir(path, { recursive: true }, (err) => {
             if (err) return reject(err);
-            resolve(true)
+            return resolve(true)
         })
     })
 }

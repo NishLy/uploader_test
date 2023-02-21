@@ -5,7 +5,7 @@ import { drawAlert } from "../utils/drawAlert";
 import DropZone from "../utils/dragAndDrop";
 import FileInput from "../utils/htmlFileInput";
 import DrawMTableData from "../utils/drawTable";
-import { UPLOADER_CONFIGURATION } from "../..";
+import { DATA_INTERFACE, UPLOADER_CONFIGURATION } from "../..";
 // import useFetch, { HTTP } from "../lib/useFetch";
 import drawTitle from "../utils/drawTitle";
 import initializeTimer from "../utils/drawTimer";
@@ -14,6 +14,7 @@ import xhrRequest, { HTTP, xhrRequestError } from "../lib/xhrrequest";
 
 /* A variable that is used to store the configuration of the uploader. */
 let config: UPLOADER_CONFIGURATION | null = null
+let dataSnapshot: null | DATA_INTERFACE[] = null
 
 /**
  * If the event is not null, prevent the default action, then remove the class 'drag' from the element
@@ -32,7 +33,10 @@ let timer: Timer | null = null
 
 window.onload = () => {
     /* A function that is called when the data is received. */
-    onDataRecived((data) => DrawMTableData(data))
+    onDataRecived((data) => {
+        dataSnapshot = data.data
+        DrawMTableData(data)
+    })
     /* Creating a new DropZone object. */
     new DropZone({
         targetDiv: document.querySelector('#drop-zone') as HTMLDivElement,
@@ -50,7 +54,10 @@ window.onload = () => {
         timer = initializeTimer(config!.end);
         drawAlert("Konfigurasi terupdate", 1);
         mountFileListener();
-        renderSelectForm();
+        config?.choiches?.length !== 0 ? renderSelectForm() : (() => {
+            document.querySelector("#kode_soal_field")?.previousElementSibling?.remove()
+            document.querySelector("#kode_soal_field")?.remove()
+        })()
     })
 
     /* Rendering the select form, mounting the event listener, mounting the file listener, and drawing
@@ -137,11 +144,12 @@ function mountEventListener() {
         fileInput?.click();
     });
     document.querySelector('#form-main')?.addEventListener("submit", async (event: Event) => {
-        
         event.preventDefault();
         if (!config) return drawAlert("Konfigurasi Belum valid!", 2)
         if (new Date(config.end).getTime() - new Date().getTime() <= 0) return drawAlert("Waktu Telah Habis!. Upload Gagal", 3)
+
         const formData = new FormData(event.target as HTMLFormElement)
+        if (dataSnapshot?.find(e => e.nim === formData.get('nim'))) return drawAlert("NIM : " + formData.get('nim') + " Telah Mengupload", 3)
 
         const unmountUploadBar = drawAlert("", -1, false,
             `<div class="progress relative w-full h-full rounded-md">
@@ -186,7 +194,6 @@ function mountEventListener() {
         (document.querySelector('#form-main') as HTMLFormElement)?.reset()
         fileInputObject.resetInput()
     })
-
     document.querySelector('#fileInput')?.addEventListener('change', () => fileInputObject.fileValidition())
 }
 
@@ -203,6 +210,7 @@ const renderSelectForm = (): void => {
         const label = document.createElement('label')
         const selectOld = document.getElementsByName('kode_soal')[0]
         select.name = "kode_soal"
+        select.id = "kode_soal_field"
         select.title = "Pilih Kode Soal"
         select.className = "bg-transparent p-2"
         label.htmlFor = "choices"

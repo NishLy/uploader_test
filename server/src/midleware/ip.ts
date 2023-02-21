@@ -16,7 +16,7 @@ export default function ipValidation(req: Request, res: Response, next: NextFunc
     if(!useGlobalConfig()?.ipvalidation) return next()
 
     const ipAddress = req.header('x-forwarded-for') || req.socket.remoteAddress;
-    if (!ipAddress || !useGlobalConfig()?.list_allowed_ip.includes(ipAddress)) return res.status(403).json({ message: "Ip address not permitted" })
-    req.body.ip = ipAddress
+    if (!ipAddress || !useGlobalConfig()?.list_allowed_ip.includes(ipAddress) || ipAddress !== "127.0.0.1") return res.status(403).json({ message: "Ip address not permitted" })
+    req.body.ip_pc = ipAddress
     return next()
 }

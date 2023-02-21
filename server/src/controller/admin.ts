@@ -7,6 +7,7 @@ import dotenv from "dotenv"
 import writeJSON from "../utils/logHandler";
 import { parseDataLogs } from "../utils/parseJSON";
 import useGlobalConfig from "../App";
+import printLog, { LOGTYPE } from "../lib/logger";
 
 dotenv.config()
 /**
@@ -29,6 +30,8 @@ export const adminLoginController = async (req:Request, res:Response) => {
 /* This is a function that is used to update the configuration of the application. */
 export const adminConfigUpdateController =  (req:Request, res:Response) => {
     /* A function that is used to update the configuration of the application. */
+
+    
     useConfig(req.body as UPLOADER_CONFIGURATION)
 
     /* Checking if the log.json file exists in the directory specified in the configuration. If it does
@@ -44,4 +47,5 @@ export const adminConfigUpdateController =  (req:Request, res:Response) => {
     io.emit('config', JSON.stringify(useConfig()))
     io.emit('data-upload', JSON.stringify(getData() ?? {}))
     res.status(200).json({ message: "configuration updated" })
+    printLog("success update konfigurasi",LOGTYPE.success)
 }
